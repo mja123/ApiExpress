@@ -6,7 +6,6 @@ let products = [];
 let id = 0;
 
 router.post('/aleatory', (req, res) => {
-
   const { productsCount } = req.query;
   const limitOfProducts = productsCount || 10;
 
@@ -16,7 +15,7 @@ router.post('/aleatory', (req, res) => {
       name: faker.commerce.productName(),
       price: faker.commerce.price(),
     });
-    id ++;
+    id++;
   }
   res.status(201).send(`${limitOfProducts} created succesfully!`);
 });
@@ -27,38 +26,89 @@ router.post('/', (req, res) => {
   products.push({
     id: id,
     name: body.name,
-    price: body.price
+    price: body.price,
   });
 
   res.json({
-    message: "Product created succesfully!",
+    message: 'Product created succesfully!',
     id: id,
-    data: body
+    data: body,
   });
   id++;
-})
-
+});
 
 router.get('/', (req, res) => {
   const { limit, offset } = req.query;
 
   const auxiliary = [];
-  if(limit && offset) {
+  if (limit && offset) {
     if (offset < products.length - 1) {
-      for(let i = offset; i < limit; i++) {
+      for (let i = offset; i < limit; i++) {
         auxiliary.push(products[i]);
       }
-      res.json(auxiliary)
+      res.json(auxiliary);
     }
   } else {
     res.json(products);
   }
-
 });
 
 router.get('/:id', (req, res) => {
   const { id } = req.params;
   res.json(products[id]);
+});
+
+router.patch('/:id', (req, res) => {
+  const { id } = req.params;
+  let body = req.body;
+
+  if (body.name) {
+    products[id] = {
+      id: id,
+      name: body.name,
+      price: products[id].price,
+    };
+    res.json({
+      message: 'Product pached correctly!',
+      data: products[id]
+    });
+  } if (body.price) {
+    products[id] = {
+      id: id,
+      name: products[id].name,
+      price: body.price,
+    };
+    res.json({
+      message: 'Product pached correctly!',
+      data: products[id]
+    });
+  }
+});
+
+router.put('/:id', (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+
+  products[id] = {
+    id: id,
+    name: body.name,
+    price: body.price,
+  };
+
+  res.json({
+    message: 'Product updated succesfully!',
+    id: id,
+    data: body,
+  });
+});
+
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  res.json({
+    message: 'Product deleted succesfully!',
+    data: products[id],
+  });
+  products.splice(id, 1);
 });
 
 module.exports = router;

@@ -47,4 +47,28 @@ router.get('/:id', (req, res) => {
   res.json(users[id]);
 })
 
+router.patch('/:id', (req, res) => {
+  const { id } = req.params;
+  let body = req.body;
+
+  users[id] = {
+    id: id,
+    name: body.name,
+  };
+  res.json({
+    message: 'User pached correctly!',
+    data: users[id]
+  });
+});
+
+
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  res.json({
+    message: 'User deleted succesfully!',
+    data: users[id],
+  });
+  users.splice(id, 1);
+});
+
 module.exports = router;
