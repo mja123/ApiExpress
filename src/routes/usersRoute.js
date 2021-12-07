@@ -1,59 +1,49 @@
 const express = require('express');
-const faker = require('faker');
 const responses = require('../helpers/responses')
+
 const router = express.Router();
-let users = [];
-let idElement = 0;
+const UserService = require('./../services/userService')
+const service = new UserService();
 
-router.post('/aleatory', (req, res) => {
-  const { usersCount } = req.query;
-  const limitOfUsers = usersCount || 10
-
-  for (let i = 0; i < limitOfUsers; i++) {
-    users.push({
-      id: idElement,
-      name: faker.name.firstName(),
-    });
-    idElement++;
-  }
-  res.status(201).send(`${limitOfUsers} created succesfully!`);
-});
 
 router.post('/', (req, res) => {
   const body = req.body;
+  const newUser = service.post(body);
+  responses.succesful(newUser, 201, 'User created succesfully!', res);
 
-  users.push({
-    id: idElement,
-    name: body.name
-    });
-    responses.succesful(users, idElement, 201, 'User created succesfully!', res)
-    idElement++;
 })
 
 router.get('/', (req, res) => {
-  res.json(users)
+  const { limit, offset } = req.query;
+
+  const getUsers = service.get(limit, offset)
+
+  if(getUsers.length != 0) {
+    res.json(getUsers);
+  } else {
+    responses.error(404, 'Users not found', res);
+  }
+
 });
 
 router.get('/:id', (req, res) => {
   const { id } = req.params;
+  const getUserById = service.findOne(id);
 
-  if(responses.findId(users, id, idElement)) {
-    responses.succesful(users, idElement, 200, 'User found succesfully!', res);
+  if(getUserById != undefined) {
+     responses.succesful(getUserById, 200, 'User found!', res);
   } else {
     responses.error(404, 'User not found', res);
   }
-})
-
-router.patch('/:id', (req, res) => {
+});
+router.put('/:id', (req, res) => {
   const { id } = req.params;
-  let body = req.body;
+  const body = req.body;
 
-  if(responses.findId(users, id, idElement)) {
-    users[id] = {
-      id: id,
-      name: body.name,
-    };
-    responses.succesful(users, idElement, 200, 'User patched succesfully!', res);
+  const putUser = service.put(id, body);
+
+  if(putUser != -1) {
+    responses.succesful(putUser, 200, 'User updated correctly!', res)
   } else {
     responses.error(404, 'User not found', res);
   }
@@ -62,12 +52,15 @@ router.patch('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
-  if(responses.findId(users, id, idElement)) {
-    responses.succesful(users, idElement, 200, 'User deleted succesfully!', res);
+
+  const deleteUser = service.delete(id);
+
+  if(deleteUser != -1) {
+    responses.succesful(deleteUser, 200, 'User deleted correctly!', res)
   } else {
     responses.error(404, 'User not found', res);
   }
-  users.splice(id, 1);
+
 });
 
 module.exports = router;
