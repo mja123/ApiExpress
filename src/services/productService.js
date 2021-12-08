@@ -65,6 +65,7 @@ class ProductService{
     if(responses(this.products, id, this.idElement)) {
       if (body.name) {
         this.products[id] = {
+          //spread operator...
           id: id,
           name: body.name,
           price: this.products[id].price,
