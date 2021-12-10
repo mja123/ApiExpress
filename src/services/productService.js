@@ -1,31 +1,34 @@
 const faker = require('faker');
-const responses = require('./../helpers/responses').findId
-class ProductService{
+const responses = require('./../helpers/responses').findId;
+const boom = require('@hapi/boom');
 
-  constructor(){
+class ProductService {
+  constructor() {
     this.products = [];
     this.idElement = 0;
     this.generate();
   }
 
   generate() {
-
     const limitOfProducts = 100;
     for (let i = 0; i < limitOfProducts; i++) {
       this.products.push({
         id: this.idElement,
         name: faker.commerce.productName(),
         price: faker.commerce.price(),
+        isBlock: faker.datatype.boolean(),
       });
       this.idElement++;
-
     }
   }
 
   get(limit = this.products.length, offset = 0) {
     const auxiliary = [];
 
-    if (limit == undefined && offset == undefined || limit != undefined && offset != undefined) {
+    if (
+      (limit == undefined && offset == undefined) ||
+      (limit != undefined && offset != undefined)
+    ) {
       for (let i = offset; i < limit; i++) {
         auxiliary.push(this.products[i]);
       }
@@ -44,8 +47,13 @@ class ProductService{
     return auxiliary;
   }
   findOne(id) {
-
-    const product = this.products.find(element => element.id == id);
+    const product = this.products.find((element) => element.id == id);
+    if (!product) {
+      throw boom.notFound('Product not found');
+    }
+    if (product.isBlock) {
+      throw boom.conflict('This product is blocking');
+    }
     return product;
   }
 
@@ -54,6 +62,7 @@ class ProductService{
       id: this.idElement,
       name: body.name,
       price: body.price,
+      isBlock: faker.datatype.boolean()
     });
     this.idElement++;
 
@@ -61,49 +70,55 @@ class ProductService{
   }
 
   patch(id, body) {
-
-    if(responses(this.products, id, this.idElement)) {
+    if (responses(this.products, id, this.idElement)) {
+      const product = this.products[id];
+      if (product.isBlock) {
+        throw boom.conflict("This product is blocking!");
+      }
+      if (body.price) {
+        this.products[id] = {
+          ...this.products[id],
+          price: body.price
+        };
+      }
       if (body.name) {
         this.products[id] = {
-          //spread operator...
-          id: id,
-          name: body.name,
-          price: this.products[id].price,
-        }
-      } if (body.price) {
-        this.products[id] = {
-          id: id,
-          name: this.products[id].name,
-          price: body.price,
+          ...this.products[id],
+          name: body.name
         };
       }
       return this.products[id];
     } else {
-      return -1;
+      throw boom.notFound('Product not found!');
     }
   }
   put(id, body) {
-
-    if(responses(this.products, id, this.idElement)) {
+    if (responses(this.products, id, this.idElement)) {
+      const product = this.products[id];
+      if(product.isBlock) {
+        throw boom.conflict("This product is blocking!");
+      }
       this.products[id] = {
-        id: id,
+        ...this.products[id],
         name: body.name,
         price: body.price,
       };
       return this.products[id];
     } else {
-      return -1;
+      throw boom.notFound('Product not found!');
     }
-
   }
 
   delete(id) {
-
-    if(responses(this.products, id, this.idElement)) {
+    if (responses(this.products, id, this.idElement)) {
+      const product = this.products[id];
+      if(product.isBlock) {
+        throw boom.conflict("This product is blocking!")
+      }
       this.products.splice(id, 1);
-      return 1
+      return product;
     } else {
-      return -1
+      throw boom.notFound('Product not found!');
     }
   }
 }

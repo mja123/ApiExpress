@@ -1,82 +1,81 @@
 const express = require('express');
-const ProductService = require('./../services/productService')
-const responses = require('../helpers/responses')
+const ProductService = require('./../services/productService');
+const responses = require('../helpers/responses');
 
 const router = express.Router();
 const service = new ProductService();
-
 
 router.post('/', (req, res) => {
   const body = req.body;
   const newProduct = service.post(body);
   responses.succesful(newProduct, 201, 'Product created succesfully!', res);
-
 });
 
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
   const { limit, offset } = req.query;
 
-  const getProducts = service.get(limit, offset)
+  const getProducts = service.get(limit, offset);
 
-  if(getProducts.length != 0) {
-    res.json(getProducts);
-  } else {
-    responses.error(404, 'Products not found', res);
+  try {
+    if (getProducts.length != 0) {
+      res.json(getProducts);
+    }
+  } catch (error) {
+    next(error);
   }
-
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
   const { id } = req.params;
-  const getById = service.findOne(id);
+  const getProductById = service.findOne(id);
 
-  if(getById != undefined) {
-     responses.succesful(getById, 200, 'Product found!', res);
-  } else {
-    responses.error(404, 'Product not found', res);
+  try {
+    getProductById;
+    responses.succesful(getProductById, 200, 'Product found!', res);
+  } catch (error) {
+    next(error);
   }
 });
 
-router.patch('/:id', (req, res) => {
+router.patch('/:id', (req, res, next) => {
   const { id } = req.params;
   let body = req.body;
 
   const patchProduct = service.patch(id, body);
 
-  if(patchProduct != -1) {
-    responses.succesful(patchProduct, 200, 'Product pached correctly!', res)
-  } else {
-    responses.error(404, 'Product not found', res);
+  try {
+    patchProduct;
+    responses.succesful(patchProduct, 200, 'Product pached correctly!', res);
+  } catch (error) {
+    next(error);
   }
-
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const body = req.body;
 
   const putProduct = service.put(id, body);
 
-  if(putProduct != -1) {
-    responses.succesful(putProduct, 200, 'Product updated correctly!', res)
-  } else {
-    responses.error(404, 'Product not found', res);
+  try {
+    putProduct;
+    responses.succesful(putProduct, 200, 'Product updated correctly!', res);
+  } catch (error) {
+    next(error);
   }
-
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
-  const delteProduct = service.delete(id);
+  const deleteProduct = service.delete(id);
 
-  if(delteProduct != -1) {
-    responses.succesful(delteProduct, 200, 'Product deleted correctly!', res)
-  } else {
-    responses.error(404, 'Product not found', res);
+  try {
+    deleteProduct;
+    responses.succesful(deleteProduct, 200, 'Product deleted correctly!', res);
+  } catch (error) {
+    next(error);
   }
-
 });
-
 
 module.exports = router;

@@ -26,41 +26,42 @@ router.get('/', (req, res) => {
 
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
   const { id } = req.params;
   const getUserById = service.findOne(id);
 
-  if(getUserById != undefined) {
-     responses.succesful(getUserById, 200, 'User found!', res);
-  } else {
-    responses.error(404, 'User not found', res);
+  try {
+      responses.succesful(getUserById, 200, 'User found!', res);
+  } catch (error) {
+    next(error);
   }
 });
-router.put('/:id', (req, res) => {
+router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const body = req.body;
 
   const putUser = service.put(id, body);
 
-  if(putUser != -1) {
-    responses.succesful(putUser, 200, 'User updated correctly!', res)
-  } else {
-    responses.error(404, 'User not found', res);
+  try {
+    putUser;
+    responses.succesful(putUser, 200, 'User updated correctly!', res);
+  } catch(error) {
+    next(error);
   }
 });
 
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   const deleteUser = service.delete(id);
 
-  if(deleteUser != -1) {
+  try {
+    deleteUser;
     responses.succesful(deleteUser, 200, 'User deleted correctly!', res)
-  } else {
-    responses.error(404, 'User not found', res);
+  } catch (error) {
+    next(error);
   }
-
 });
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const faker = require('faker');
 const responses = require('./../helpers/responses').findId
+const boom = require('@hapi/boom');
 
 class UserService{
 
@@ -16,6 +17,7 @@ class UserService{
       this.users.push({
         id: this.idElement,
         name: faker.name.firstName(),
+        isBlock: faker.datatype.boolean()
       });
       this.idElement++;
 
@@ -44,8 +46,15 @@ class UserService{
     return auxiliary;
   }
   findOne(id) {
-
+    //trying the middleware erro
+    //asdfasdf;
     const user = this.users.find(element => element.id == id);
+    if(!user) {
+      throw boom.notFound("User not found!");
+    }
+    if(user.isBlock) {
+      throw boom.conflict("This user is blocking!");
+    }
     return user;
   }
 
@@ -53,6 +62,7 @@ class UserService{
     this.users.push({
       id: this.idElement,
       name: body.name,
+      isBlock: faker.datatype.boolean(),
     });
     this.idElement++;
 
@@ -62,13 +72,18 @@ class UserService{
   put(id, body) {
 
     if(responses(this.users, id, this.idElement)) {
+      const user = this.users[id];
+
+      if(user.isBlock) {
+        throw boom.conflict("This user is blocking!");
+      }
       this.users[id] = {
-        id: id,
+        ...user,
         name: body.name,
       };
-      return this.users[id];
+      return this.user;
     } else {
-      return -1;
+      throw boom.notFound("User not found!");
     }
 
   }
@@ -76,10 +91,15 @@ class UserService{
   delete(id) {
 
     if(responses(this.users, id, this.idElement)) {
+      const user = this.users[id];
+
+      if(user.isBlock) {
+        throw boom.conflict("This user is blocking!");
+      }
       this.users.splice(id, 1);
-      return 1
+      return user;
     } else {
-      return -1
+      throw boom.notFound("User not found!");
     }
   }
 }
