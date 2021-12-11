@@ -7,13 +7,8 @@ const app = express();
 const port = process.env.PORT;
 
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.send("I'm a get method!");
-});
-
-
 routerManager(app);
+
 app.use(consoleError);
 app.use(sendingBoomError);
 app.use(sendingError);

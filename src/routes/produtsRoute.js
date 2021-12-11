@@ -1,11 +1,18 @@
 const express = require('express');
+
 const ProductService = require('./../services/productService');
 const responses = require('../helpers/responses');
-
+const validatorHandler = require('./../middlewares/validators');
+const {
+  createSchema,
+  updateSchema,
+  deleteSchema,
+  findOneSchema,
+} = require('./../validators/productsSchemaValidator');
 const router = express.Router();
 const service = new ProductService();
 
-router.post('/', (req, res) => {
+router.post('/', validatorHandler(createSchema, 'body'), (req, res) => {
   const body = req.body;
   const newProduct = service.post(body);
   responses.succesful(newProduct, 201, 'Product created succesfully!', res);
@@ -25,57 +32,78 @@ router.get('/', (req, res, next) => {
   }
 });
 
-router.get('/:id', (req, res, next) => {
-  const { id } = req.params;
-  const getProductById = service.findOne(id);
+router.get(
+  '/:id',
+  validatorHandler(findOneSchema, 'params'),
+  (req, res, next) => {
+    const { id } = req.params;
+    const getProductById = service.findOne(id);
 
-  try {
-    getProductById;
-    responses.succesful(getProductById, 200, 'Product found!', res);
-  } catch (error) {
-    next(error);
+    try {
+      getProductById;
+      responses.succesful(getProductById, 200, 'Product found!', res);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.patch('/:id', (req, res, next) => {
-  const { id } = req.params;
-  let body = req.body;
+router.patch(
+  '/:id',
+  validatorHandler(updateSchema, ['params', 'body']),
+  (req, res, next) => {
+    const { id } = req.params;
+    let body = req.body;
 
-  const patchProduct = service.patch(id, body);
+    const patchProduct = service.patch(id, body);
 
-  try {
-    patchProduct;
-    responses.succesful(patchProduct, 200, 'Product pached correctly!', res);
-  } catch (error) {
-    next(error);
+    try {
+      patchProduct;
+      responses.succesful(patchProduct, 200, 'Product pached correctly!', res);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.put('/:id', (req, res, next) => {
-  const { id } = req.params;
-  const body = req.body;
+router.put(
+  '/:id',
+  validatorHandler(updateSchema, ['params', 'body']),
+  (req, res, next) => {
+    const { id } = req.params;
+    const body = req.body;
 
-  const putProduct = service.put(id, body);
+    const putProduct = service.put(id, body);
 
-  try {
-    putProduct;
-    responses.succesful(putProduct, 200, 'Product updated correctly!', res);
-  } catch (error) {
-    next(error);
+    try {
+      putProduct;
+      responses.succesful(putProduct, 200, 'Product updated correctly!', res);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.delete('/:id', (req, res, next) => {
-  const { id } = req.params;
+router.delete(
+  '/:id',
+  validatorHandler(deleteSchema, 'params'),
+  (req, res, next) => {
+    const { id } = req.params;
 
-  const deleteProduct = service.delete(id);
+    const deleteProduct = service.delete(id);
 
-  try {
-    deleteProduct;
-    responses.succesful(deleteProduct, 200, 'Product deleted correctly!', res);
-  } catch (error) {
-    next(error);
+    try {
+      deleteProduct;
+      responses.succesful(
+        deleteProduct,
+        200,
+        'Product deleted correctly!',
+        res
+      );
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 module.exports = router;
