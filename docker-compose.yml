@@ -2,12 +2,20 @@ version: '3.3'
 
 services:
   postgres:
-    image: postgres:13
+    image: postgres:14.1
     environment:
       - POSTGRES_DB=my_store
       - POSTGRES_USER=mja123
       - POSTGRES_PASSWORD=159123456asd
     ports:
-      - 5432:5432
+      - 3000:5432
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_data/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=mati.aguilar011@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=159123456asd
+    ports:
+      - 5050:80
