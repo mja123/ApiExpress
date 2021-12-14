@@ -1,6 +1,7 @@
 const faker = require('faker');
 const responses = require('./../helpers/responses').findId
 const boom = require('@hapi/boom');
+const dbConnection = require('./../libs/postgres');
 
 class UserService{
 
@@ -24,30 +25,23 @@ class UserService{
     }
   }
 
-  get(limit = this.users.length, offset = 0) {
-    const auxiliary = [];
+  async get() {
 
-    if (limit == undefined && offset == undefined || limit != undefined && offset != undefined) {
-      for (let i = offset; i < limit; i++) {
-        auxiliary.push(this.users[i]);
-      }
-    }
-    if (limit == undefined && offset != undefined) {
-      for (let i = offset; i < this.users.length; i++) {
-        auxiliary.push(this.users[i]);
-      }
-    }
-    if (limit != undefined && offset == undefined) {
-      for (let i = 0; i < limit; i++) {
-        auxiliary.push(this.users[i]);
-      }
-    }
+    try {
+      const client = await dbConnection();
 
-    return auxiliary;
+      const users = await client.query('SELECT * FROM users');
+      console.log("SERVICE, TRY")
+      return users.rows;
+    } catch(error) {
+      console.log("SERVICE, CATCH")
+      throw boom.notImplemented('Failed database connection :(')
+    }
   }
   findOne(id) {
     //trying the middleware erro
     //asdfasdf;
+
     const user = this.users.find(element => element.id == id);
     if(!user) {
       throw boom.notFound("User not found!");

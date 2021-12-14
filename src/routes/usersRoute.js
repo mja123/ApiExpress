@@ -10,6 +10,7 @@ const {
   deleteSchema,
   findOneSchema,
 } = require('./../validators/usersSchemaVlidator');
+
 const service = new UserService();
 
 router.post('/', validatorHandler(createSchema, 'body'), (req, res) => {
@@ -18,24 +19,24 @@ router.post('/', validatorHandler(createSchema, 'body'), (req, res) => {
   responses.succesful(newUser, 201, 'User created succesfully!', res);
 });
 
-router.get('/', (req, res) => {
-  const { limit, offset } = req.query;
-
-  const getUsers = service.get(limit, offset);
-
-  if (getUsers.length != 0) {
-    res.json(getUsers);
-  } else {
-    responses.error(404, 'Users not found', res);
+router.get('/', async (req, res, next) => {
+  try {
+    const users = await service.get();
+    console.log("ROUTE, TRY")
+    responses.succesful(users, 200, 'User found!', res);
+  } catch(error) {
+    console.log("ROUTE, CATCH")
+    next(error);
   }
-});
+})
+
 
 router.get(
   '/:id',
   validatorHandler(findOneSchema, 'params'),
-  (req, res, next) => {
+  async (req, res, next) => {
     const { id } = req.params;
-    const getUserById = service.findOne(id);
+    const getUserById = await service.findOne(id);
 
     try {
       responses.succesful(getUserById, 200, 'User found!', res);
