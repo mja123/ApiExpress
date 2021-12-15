@@ -1,12 +1,15 @@
 const joi = require('joi');
 
 const id = joi.number();
-const name = joi.string().min(3).max(20);
+const email = joi.string().min(3).max(50);
+const password = joi.string().min(3).max(20);
 
 const createSchema = joi.object({
-  name: name.required(),
+  email: email.required(),
+  password: password.required(),
 });
 
+/*
 const updateSchema = joi.object({
   id: id.required(),
   name: name.required(),
@@ -20,4 +23,5 @@ const findOneSchema = joi.object({
   id: id.required(),
 });
 
-module.exports = { createSchema, updateSchema, deleteSchema, findOneSchema };
+*/
+module.exports = { createSchema/*, updateSchema, deleteSchema, findOneSchema */};
