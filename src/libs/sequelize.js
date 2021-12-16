@@ -10,7 +10,7 @@ const sequelize = new Sequelize({
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
   dialect: 'postgres',
-  logging: console.log,
+  logging: true,
 });
 
 //Here we call to initialize the tables
@@ -19,14 +19,4 @@ setUpModels(sequelize);
 //This creates the table
 sequelize.sync();
 
-const startingConnection = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-  }
-}
-
-
-module.exports = { sequelize/*, startingConnection*/ };
+module.exports = sequelize;

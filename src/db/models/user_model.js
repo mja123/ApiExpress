@@ -17,7 +17,12 @@ const userSchema = {
   password: {
     allowNull: false,
     type: DataTypes.STRING,
-
+  },
+  createdAt: {
+    allowNull: false,
+    type: DataTypes.DATE,
+    field: 'create_at',
+    defaultValue: Sequelize.NOW
   }
 
 };
@@ -33,12 +38,13 @@ class User extends Model {
     return {
       sequelize,
       tableName: userTable,
-      modelName: 'User'
+      modelName: 'User',
+      timestamps: false,
     }
   }
 }
 
-module.exports = { User, userSchema, userTable };
+module.exports = { userTable, userSchema, User };
 
 /*
 TODO: fix the userSchema in the validations, review the UserSchema in the dbModels because when I do a request the server response me with

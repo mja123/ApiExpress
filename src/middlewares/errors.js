@@ -13,7 +13,9 @@ const sendingError = (err, req, res, next) => {
 const sendingBoomError = (err, req, res, next) => {
   if (err.isBoom) {
     const { output } = err;
+    console.error(err.stack)
     res.status(output.statusCode).json(output.payload);
+
   } else {
     next(err);
   }

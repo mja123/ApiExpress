@@ -2,14 +2,13 @@ const faker = require('faker');
 const responses = require('./../helpers/responses').findId;
 const boom = require('@hapi/boom');
 //models is created when we initialized the model, and the way to use it is with the modelName in the config of the User's Model
-const { models /*, startingConnection*/ } = require('./../libs/sequelize');
+const { models } = require('./../libs/sequelize');
 
 class UserService {
   constructor() {
     this.users = [];
     this.idElement = 0;
     this.generate();
-    //startingConnection();
   }
 
   generate() {
@@ -26,6 +25,9 @@ class UserService {
 
   async get() {
     try {
+      console.log(models + "UserService")
+      console.log(models.User + "sequelize.User")
+
       const users = await models.User.findAll();
       return users;
     } catch (error) {
