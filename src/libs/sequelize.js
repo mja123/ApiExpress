@@ -14,6 +14,8 @@ const sequelize = new Sequelize({
 });
 
 //Here we call to initialize the tables
+//when the model is initialized in the index_db.js, and the object of the database is gave, Sequelize created a "models" namespace
+//and when I export sequelize and import in the service, I can use the models identifier and specify the table's name to start with the queries
 setUpModels(sequelize);
 
 //This creates the table

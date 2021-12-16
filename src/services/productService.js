@@ -1,90 +1,57 @@
-const faker = require('faker');
-const responses = require('./../helpers/responses').findId;
 const boom = require('@hapi/boom');
+const { models } = require('./../libs/sequelize');
 
 class ProductService {
-  constructor() {
-    this.products = [];
-    this.idElement = 0;
-    this.generate();
+  async get() {
+    try {
+      const products = await models.Product.findAll();
+      return products;
+    } catch (error) {
+      throw boom.badData(error.message);
+    }
   }
 
-  generate() {
-    const limitOfProducts = 100;
-    for (let i = 0; i < limitOfProducts; i++) {
-      this.products.push({
-        id: this.idElement,
-        name: faker.commerce.productName(),
-        price: faker.commerce.price(),
-        isBlock: faker.datatype.boolean(),
+  async findOne(id) {
+    try {
+      const product = await models.Product.findOne({
+        where: {
+          id: id,
+        },
       });
-      this.idElement++;
+      return product;
+    } catch(error) {
+      throw boom.notFound(error.message);
     }
   }
 
-  get(limit = this.products.length, offset = 0) {
-    const auxiliary = [];
-
-    if (
-      (limit == undefined && offset == undefined) ||
-      (limit != undefined && offset != undefined)
-    ) {
-      for (let i = offset; i < limit; i++) {
-        auxiliary.push(this.products[i]);
-      }
+  async post(body) {
+    try {
+      const newProduct = await models.Product.create({
+        name: body.name,
+        price: body.price,
+      });
+      return newProduct;
+    } catch (error) {
+      throw boom.badData(error.message);
     }
-    if (limit == undefined && offset != undefined) {
-      for (let i = offset; i < this.products.length; i++) {
-        auxiliary.push(this.products[i]);
-      }
-    }
-    if (limit != undefined && offset == undefined) {
-      for (let i = 0; i < limit; i++) {
-        auxiliary.push(this.products[i]);
-      }
-    }
-
-    return auxiliary;
   }
-  findOne(id) {
-    const product = this.products.find((element) => element.id == id);
-    if (!product) {
-      throw boom.notFound('Product not found');
-    }
-    if (product.isBlock) {
-      throw boom.conflict('This product is blocking');
-    }
-    return product;
-  }
-
-  post(body) {
-    this.products.push({
-      id: this.idElement,
-      name: body.name,
-      price: body.price,
-      isBlock: faker.datatype.boolean()
-    });
-    this.idElement++;
-
-    return this.products[this.idElement - 1];
-  }
-
+/*
   patch(id, body) {
     if (responses(this.products, id, this.idElement)) {
       const product = this.products[id];
       if (product.isBlock) {
-        throw boom.conflict("This product is blocking!");
+        throw boom.conflict('This product is blocking!');
       }
       if (body.price) {
         this.products[id] = {
           ...this.products[id],
-          price: body.price
+          price: body.price,
         };
       }
       if (body.name) {
         this.products[id] = {
           ...this.products[id],
-          name: body.name
+          name: body.name,
         };
       }
       return this.products[id];
@@ -95,8 +62,8 @@ class ProductService {
   put(id, body) {
     if (responses(this.products, id, this.idElement)) {
       const product = this.products[id];
-      if(product.isBlock) {
-        throw boom.conflict("This product is blocking!");
+      if (product.isBlock) {
+        throw boom.conflict('This product is blocking!');
       }
       this.products[id] = {
         ...this.products[id],
@@ -108,17 +75,17 @@ class ProductService {
       throw boom.notFound('Product not found!');
     }
   }
-
-  delete(id) {
-    if (responses(this.products, id, this.idElement)) {
-      const product = this.products[id];
-      if(product.isBlock) {
-        throw boom.conflict("This product is blocking!")
-      }
-      this.products.splice(id, 1);
-      return product;
-    } else {
-      throw boom.notFound('Product not found!');
+*/
+  async delete(id) {
+    try {
+      const deletingProduct = await models.Product.destroy({
+        where: {
+          id: id,
+        },
+      });
+      return deletingProduct;
+    } catch(error) {
+      throw boom.notFound(error.message);
     }
   }
 }

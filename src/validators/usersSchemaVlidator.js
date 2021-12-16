@@ -9,10 +9,10 @@ const createSchema = joi.object({
   password: password.required(),
 });
 
-/*
 const updateSchema = joi.object({
   id: id.required(),
-  name: name.required(),
+  email: email,
+  password: password,
 });
 
 const deleteSchema = joi.object({
@@ -23,5 +23,4 @@ const findOneSchema = joi.object({
   id: id.required(),
 });
 
-*/
-module.exports = { createSchema/*, updateSchema, deleteSchema, findOneSchema */};
+module.exports = { createSchema, updateSchema, deleteSchema, findOneSchema };

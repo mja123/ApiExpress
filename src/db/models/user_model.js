@@ -17,14 +17,7 @@ const userSchema = {
   password: {
     allowNull: false,
     type: DataTypes.STRING,
-  },
-  createdAt: {
-    allowNull: false,
-    type: DataTypes.DATE,
-    field: 'create_at',
-    defaultValue: Sequelize.NOW
   }
-
 };
 
 //Extends Model to get all the queries, Model is the representation of the table in the db
@@ -39,7 +32,7 @@ class User extends Model {
       sequelize,
       tableName: userTable,
       modelName: 'User',
-      timestamps: false,
+      timestamps: true,
     }
   }
 }

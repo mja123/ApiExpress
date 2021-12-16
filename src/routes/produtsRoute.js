@@ -12,21 +12,23 @@ const {
 const router = express.Router();
 const service = new ProductService();
 
-router.post('/', validatorHandler(createSchema, 'body'), (req, res) => {
+router.post('/', validatorHandler(createSchema, 'body'), async (req, res, next) => {
   const body = req.body;
-  const newProduct = service.post(body);
-  responses.succesful(newProduct, 201, 'Product created succesfully!', res);
+  try {
+    const newProduct = await service.post(body);
+    responses(newProduct, 201, 'Product created succesfully!', res);
+  } catch(error) {
+    next(error);
+  }
+
 });
 
-router.get('/', (req, res, next) => {
-  const { limit, offset } = req.query;
+router.get('/', async (req, res, next) => {
 
-  const getProducts = service.get(limit, offset);
+  const getProducts = await service.get();
 
   try {
-    if (getProducts.length != 0) {
-      res.json(getProducts);
-    }
+    responses(getProducts, 200, 'Product found succesfully!', res)
   } catch (error) {
     next(error);
   }
@@ -35,31 +37,28 @@ router.get('/', (req, res, next) => {
 router.get(
   '/:id',
   validatorHandler(findOneSchema, 'params'),
-  (req, res, next) => {
+  async (req, res, next) => {
     const { id } = req.params;
-    const getProductById = service.findOne(id);
 
     try {
-      getProductById;
-      responses.succesful(getProductById, 200, 'Product found!', res);
+          const getProductById = await service.findOne(id);
+      responses(getProductById, 200, 'Product found!', res);
     } catch (error) {
       next(error);
     }
   }
 );
-
+/*
 router.patch(
   '/:id',
   validatorHandler(updateSchema, ['params', 'body']),
-  (req, res, next) => {
+  async (req, res, next) => {
     const { id } = req.params;
     let body = req.body;
 
-    const patchProduct = service.patch(id, body);
-
     try {
-      patchProduct;
-      responses.succesful(patchProduct, 200, 'Product pached correctly!', res);
+      const patchProduct = await service.patch(id, body);
+      responses(patchProduct, 200, 'Product pached correctly!', res);
     } catch (error) {
       next(error);
     }
@@ -69,32 +68,28 @@ router.patch(
 router.put(
   '/:id',
   validatorHandler(updateSchema, ['params', 'body']),
-  (req, res, next) => {
+  async (req, res, next) => {
     const { id } = req.params;
     const body = req.body;
 
-    const putProduct = service.put(id, body);
-
     try {
-      putProduct;
-      responses.succesful(putProduct, 200, 'Product updated correctly!', res);
+      const putProduct = await service.put(id, body);
+      responses(putProduct, 200, 'Product updated correctly!', res);
     } catch (error) {
       next(error);
     }
   }
 );
-
+*/
 router.delete(
   '/:id',
   validatorHandler(deleteSchema, 'params'),
-  (req, res, next) => {
+  async (req, res, next) => {
     const { id } = req.params;
 
-    const deleteProduct = service.delete(id);
-
     try {
-      deleteProduct;
-      responses.succesful(
+      const deleteProduct = await service.delete(id);
+      responses(
         deleteProduct,
         200,
         'Product deleted correctly!',

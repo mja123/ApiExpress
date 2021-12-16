@@ -2,7 +2,7 @@ const joi = require('joi');
 
 const id = joi.number();
 const name = joi.string().min(3).max(20);
-const price = joi.number().integer().min(1);
+const price = joi.number().integer().min(10);
 
 const createSchema = joi.object({
   name: name.required(),
