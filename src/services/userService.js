@@ -12,16 +12,16 @@ class UserService {
     }
   }
   async findOne(id) {
-    try {
       const user = await models.User.findOne({
         where: {
           id: id,
         },
       });
-      return user;
-    } catch (error) {
-      throw boom.notFound(error.message);
-    }
+      if(user) {
+        return user;
+      }
+      throw boom.notFound('User not found');
+
   }
 
   async post(body) {
@@ -29,6 +29,7 @@ class UserService {
       const newUser = await models.User.create({
         email: body.email,
         password: body.password,
+        role: body.role,
       });
 
       return newUser;
@@ -37,25 +38,39 @@ class UserService {
     }
   }
 
+  async put(id, body) {
+    try {
+      console.log("id " + id)
+      const user = await this.findOne(id);
+      const changingUser = await user.update({
+        email: body.email,
+        password: body.password,
+        role: body.role || 'client',
+
+      });
+      return changingUser;
+    } catch(error) {
+      throw boom.badRequest(error.message);
+    }
+  }
+
+
   async patch(id, body) {
     try {
+      const user = await this.findOne(id);
+
       let attributeChange;
       if (body.password) {
         attributeChange = 'password';
-      } else {
+      } else if (body.email) {
         attributeChange = 'email';
+      } else {
+        attributeChange = 'role';
       }
-      const modifingUser = await models.User.update(
-        {
-          attributeChange: attributeChange.body,
-        },
-        {
-          where: {
-            id: id,
-          },
-        }
-      );
-      return modifingUser;
+      const patchedUser = await user.update({
+        attributeChange: attributeChange.body,
+      })
+      return patchedUser;
     } catch (error) {
       throw boom.notFound(error.message);
     }
@@ -63,12 +78,13 @@ class UserService {
 
   async delete(id) {
     try {
-      const deletingUser = await models.User.destroy({
+      await this.findOne(id);
+      await models.User.destroy({
         where: {
           id: id,
         },
       });
-      return deletingUser;
+      return id;
     } catch (error) {
       throw boom.notFound(error.message);
     }

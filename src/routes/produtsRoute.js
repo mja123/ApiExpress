@@ -1,7 +1,6 @@
 const express = require('express');
 
 const ProductService = require('./../services/productService');
-const responses = require('../helpers/responses');
 const validatorHandler = require('./../middlewares/validators');
 const {
   createSchema,
@@ -16,7 +15,7 @@ router.post('/', validatorHandler(createSchema, 'body'), async (req, res, next) 
   const body = req.body;
   try {
     const newProduct = await service.post(body);
-    responses(newProduct, 201, 'Product created succesfully!', res);
+    res.status(201).json(newProduct);
   } catch(error) {
     next(error);
   }
@@ -28,7 +27,7 @@ router.get('/', async (req, res, next) => {
   const getProducts = await service.get();
 
   try {
-    responses(getProducts, 200, 'Product found succesfully!', res)
+    res.status(200).json(getProducts);
   } catch (error) {
     next(error);
   }
@@ -41,14 +40,14 @@ router.get(
     const { id } = req.params;
 
     try {
-          const getProductById = await service.findOne(id);
-      responses(getProductById, 200, 'Product found!', res);
+      const getProductById = await service.findOne(id);
+      res.status(200).json(getProductById);
     } catch (error) {
       next(error);
     }
   }
 );
-/*
+
 router.patch(
   '/:id',
   validatorHandler(updateSchema, ['params', 'body']),
@@ -58,7 +57,7 @@ router.patch(
 
     try {
       const patchProduct = await service.patch(id, body);
-      responses(patchProduct, 200, 'Product pached correctly!', res);
+      res.status(200).json(patchProduct);
     } catch (error) {
       next(error);
     }
@@ -74,13 +73,13 @@ router.put(
 
     try {
       const putProduct = await service.put(id, body);
-      responses(putProduct, 200, 'Product updated correctly!', res);
+      res.status(200).json(putProduct);
     } catch (error) {
       next(error);
     }
   }
 );
-*/
+
 router.delete(
   '/:id',
   validatorHandler(deleteSchema, 'params'),
@@ -89,12 +88,7 @@ router.delete(
 
     try {
       const deleteProduct = await service.delete(id);
-      responses(
-        deleteProduct,
-        200,
-        'Product deleted correctly!',
-        res
-      );
+      res.status(200).json(deleteProduct);
     } catch (error) {
       next(error);
     }

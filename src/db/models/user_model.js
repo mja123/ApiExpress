@@ -17,14 +17,27 @@ const userSchema = {
   password: {
     allowNull: false,
     type: DataTypes.STRING,
-  }
+  },
+  role: {
+    allowNull: false,
+    type: DataTypes.STRING,
+    defaultValue: 'client',
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    field: 'created_at',
+    defaultValue: Sequelize.NOW,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    field: 'updated_at',
+    defaultValue: Sequelize.NOW,
+  },
 };
 
 //Extends Model to get all the queries, Model is the representation of the table in the db
 class User extends Model {
-  static associate() {
-
-  }
+  static associate() {}
   //receive the connection of the db (sequelize.js), return the connection, the table's name (in the db),
   // and the name of the table in the ORM, that is the identifier we'll use to query the table.
   static config(sequelize) {
@@ -32,8 +45,8 @@ class User extends Model {
       sequelize,
       tableName: userTable,
       modelName: 'User',
-      timestamps: true,
-    }
+      timestamps: false,
+    };
   }
 }
 

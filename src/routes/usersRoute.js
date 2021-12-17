@@ -1,14 +1,10 @@
 const express = require('express');
-const responses = require('../helpers/responses');
 
 const router = express.Router();
 const UserService = require('./../services/userService');
 const validatorHandler = require('./../middlewares/validators');
 const {
-  createSchema,
-  updateSchema,
-  deleteSchema,
-  findOneSchema,
+  createSchema, putSchema, patchSchema, deleteSchema, findOneSchema
 } = require('./../validators/usersSchemaVlidator');
 
 const service = new UserService();
@@ -17,7 +13,7 @@ router.post('/', validatorHandler(createSchema, 'body'), async (req, res, next) 
   try {
     const body = req.body;
     const newUser = await service.post(body);
-    responses(newUser, 201, 'User created succesfully!', res);
+    res.status(201).json(newUser);
   } catch(error) {
     next(error);
   }
@@ -27,7 +23,7 @@ router.post('/', validatorHandler(createSchema, 'body'), async (req, res, next) 
 router.get('/', async (req, res, next) => {
   try {
     const users = await service.get();
-    responses(users, 200, 'User found!', res);
+    res.status(200).json(users);
   } catch(error) {
     next(error);
   }
@@ -41,22 +37,38 @@ router.get(
     const { id } = req.params;
     try {
       const getUserById = await service.findOne(id);
-      responses(getUserById, 200, 'User found!', res);
+      res.status(200).json(getUserById);
     } catch (error) {
       next(error);
     }
   }
 );
+
+router.put('/:id', validatorHandler(findOneSchema, 'params'),
+  validatorHandler(putSchema, 'body'),
+  async(req, res, next) => {
+  const userId = req.params.id;
+  const newData = req.body;
+  console.log(userId)
+  try {
+    const userChanged = await service.put(userId, newData);
+    res.status(200).json(userChanged);
+  } catch(error) {
+    next(error);
+  }
+})
+
 router.patch(
   '/:id',
-  validatorHandler(updateSchema, ['params', 'body']),
+  validatorHandler(findOneSchema, 'params'),
+  validatorHandler(patchSchema, 'body'),
   async (req, res, next) => {
     const { id } = req.params;
     const body = req.body;
 
     try {
-      const putUser = await service.patch(id, body);
-      responses(putUser, 200, 'User updated correctly!', res);
+      const patchUser = await service.patch(id, body);
+      res.status(200).json(patchUser);
     } catch (error) {
       next(error);
     }
@@ -71,7 +83,7 @@ router.delete(
 
     try {
       const deleteUser = service.delete(id);
-      responses(deleteUser, 200, 'User deleted correctly!', res);
+      res.status(200).json(deleteUser);
     } catch (error) {
       next(error);
     }
@@ -80,4 +92,3 @@ router.delete(
 
 module.exports = router;
 
-//TODO: Hacer que se vea la data cuando se realiza con éxito un request

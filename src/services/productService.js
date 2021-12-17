@@ -12,17 +12,13 @@ class ProductService {
   }
 
   async findOne(id) {
-    try {
-      const product = await models.Product.findOne({
-        where: {
-          id: id,
-        },
-      });
+    const product = await models.Product.findOne(id);
+    if(product) {
       return product;
-    } catch(error) {
-      throw boom.notFound(error.message);
     }
+    throw boom.notFound('Product not found');
   }
+
 
   async post(body) {
     try {
@@ -35,55 +31,42 @@ class ProductService {
       throw boom.badData(error.message);
     }
   }
-/*
-  patch(id, body) {
-    if (responses(this.products, id, this.idElement)) {
-      const product = this.products[id];
-      if (product.isBlock) {
-        throw boom.conflict('This product is blocking!');
+
+  async patch(id, body) {
+    try{
+      const product = await this.findOne(id);
+      let attributeToChange;
+      if(body.name) {
+        attributeToChange = 'name';
+      } else {
+        attributeToChange = 'price'
       }
-      if (body.price) {
-        this.products[id] = {
-          ...this.products[id],
-          price: body.price,
-        };
-      }
-      if (body.name) {
-        this.products[id] = {
-          ...this.products[id],
-          name: body.name,
-        };
-      }
-      return this.products[id];
-    } else {
+      const patchingProduct = await product.update({
+        attributeToChange: attributeToChange.body
+      })
+      return patchingProduct
+    } catch(error) {
       throw boom.notFound('Product not found!');
     }
+
   }
-  put(id, body) {
-    if (responses(this.products, id, this.idElement)) {
-      const product = this.products[id];
-      if (product.isBlock) {
-        throw boom.conflict('This product is blocking!');
-      }
-      this.products[id] = {
-        ...this.products[id],
-        name: body.name,
-        price: body.price,
-      };
-      return this.products[id];
-    } else {
+  async put(id, body) {
+
+    try{
+      const product = await this.findOne(id);
+      const puttingProduct = await product.update(body)
+      return puttingProduct
+    } catch(error) {
       throw boom.notFound('Product not found!');
     }
+
   }
-*/
+
   async delete(id) {
     try {
-      const deletingProduct = await models.Product.destroy({
-        where: {
-          id: id,
-        },
-      });
-      return deletingProduct;
+      const deletingProduct = await this.findOne(id);
+      await deletingProduct.destroy();
+      return id;
     } catch(error) {
       throw boom.notFound(error.message);
     }

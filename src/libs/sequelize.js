@@ -18,7 +18,4 @@ const sequelize = new Sequelize({
 //and when I export sequelize and import in the service, I can use the models identifier and specify the table's name to start with the queries
 setUpModels(sequelize);
 
-//This creates the table
-sequelize.sync();
-
 module.exports = sequelize;
