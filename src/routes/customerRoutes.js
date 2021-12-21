@@ -1,5 +1,6 @@
 const express = require('express');
 const customerService = require('./../services/customerService');
+
 const {
   customerCreate,
   customerFind,
@@ -12,7 +13,8 @@ const service = new customerService();
 
 router.get('/', async (req, res, next) => {
   try {
-    const customers = await service.get();
+    const { user } = req.query;
+    const customers = await service.get(user);
     res.status(200).json(customers);
   } catch (error) {
     next(error);
@@ -23,9 +25,10 @@ router.post(
   '/',
   validatorHandler(customerCreate, 'body'),
   async (req, res, next) => {
+    const { user } = req.query;
     const body = req.body;
     try {
-      const createCustomer = await service.create(body);
+      const createCustomer = await service.create(body, user);
       res.status(201).json(createCustomer);
     } catch (error) {
       next(error);

@@ -37,7 +37,12 @@ const userSchema = {
 
 //Extends Model to get all the queries, Model is the representation of the table in the db
 class User extends Model {
-  static associate() {}
+  static associate(models) {
+    this.hasOne(models.Customer, {
+      as: 'customer',
+      foreignKey: 'userId',
+    });
+  }
   //receive the connection of the db (sequelize.js), return the connection, the table's name (in the db),
   // and the name of the table in the ORM, that is the identifier we'll use to query the table.
   static config(sequelize) {

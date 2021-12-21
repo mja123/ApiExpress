@@ -8,6 +8,9 @@ const setUpModels = (sequelize) => {
   User.init(userSchema, User.config(sequelize));
   Product.init(productSchema, Product.config(sequelize));
   Customer.init(customerSchema, Customer.config(sequelize));
+
+  Customer.associate(sequelize.models);
+  User.associate(sequelize.models);
 }
 
 module.exports = setUpModels;

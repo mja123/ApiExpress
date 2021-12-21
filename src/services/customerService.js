@@ -2,21 +2,47 @@ const boom = require('@hapi/boom');
 const { models } = require('./../libs/sequelize');
 
 class customerService {
-  async get() {
+  async get(includeUser) {
     try {
-      const allCustomers = await models.Customer.findAll();
+      let allCustomers = {};
+      if(includeUser == "true") {
+        allCustomers = await models.Customer.findAll({
+          include: 'user',
+        });
+      } else {
+        allCustomers = await models.Customer.findAll();
+      }
       return allCustomers;
     } catch (error) {
       throw boom.badRequest(error.message);
     }
   }
-  async create(body) {
+  async create(body, includeUser) {
     try {
-      const createCustomer = await models.Customer.create({
-        name: body.name,
-        lastName: body.lastName,
-        phone: body.phone,
-      });
+      let createCustomer = {};
+
+      if(includeUser == "true"){
+        const newUser = await models.User.create({
+
+          email: body.user.email,
+          password: body.user.password,
+        })
+        console.log(newUser.id)
+        createCustomer = await models.Customer.create({
+          name: body.name,
+          lastName: body.lastName,
+          phone: body.phone,
+          userId: newUser.id,
+        })
+      } else {
+        createCustomer = await models.Customer.create({
+          name: body.name,
+          lastName: body.lastName,
+          phone: body.phone,
+          userId: body.userId,
+        });
+      }
+      
       return createCustomer;
     } catch (error) {
       throw boom.badData(error.message);
