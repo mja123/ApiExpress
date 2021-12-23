@@ -5,14 +5,18 @@ const {
   findOneCategory,
   createCategory,
 } = require('./../validators/categorySchemaValidator');
+const queryValidator = require('./../middlewares/queryParams');
 
 const service = new CategoryService();
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
+router.get('/', queryValidator("products"),
+ async (req, res, next) => {
   try {
-    const categories = await service.get();
+    const products = req.query;
+
+    const categories = await service.get(products);
     res.status(200).json(categories);
   } catch (error) {
     next(error);

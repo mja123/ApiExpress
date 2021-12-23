@@ -8,14 +8,16 @@ const {
   customerPatch,
 } = require('./../validators/customerSchemaValidator');
 const validatorHandler = require('./../middlewares/validators');
+const queryValidator = require('./../middlewares/queryParams');
 
 const router = express.Router();
 const service = new customerService();
 
-router.get('/', async (req, res, next) => {
+router.get('/', queryValidator('users'),
+ async (req, res, next) => {
   try {
-    const { user } = req.query;
-    const customers = await service.get(user);
+    const { users } = req.query;
+    const customers = await service.get(users);
     res.status(200).json(customers);
   } catch (error) {
     next(error);
@@ -25,11 +27,12 @@ router.get('/', async (req, res, next) => {
 router.post(
   '/',
   validatorHandler(customerCreate, 'body'),
+  queryValidator('users'),
   async (req, res, next) => {
-    const { user } = req.query;
+    const { users } = req.query;
     const body = req.body;
     try {
-      const createCustomer = await service.create(body, user);
+      const createCustomer = await service.create(body, users);
       res.status(201).json(createCustomer);
     } catch (error) {
       next(error);
