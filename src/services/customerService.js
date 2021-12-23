@@ -49,15 +49,20 @@ class customerService {
     }
   }
   async findOne(id) {
-    const customer = await models.Customer.findOne({
-      where: {
-        id: id,
-      },
-    });
+    const customer = await models.Customer.findByPk(id);
     if (customer != null) {
       return customer;
     } else {
-      throw boom.notFound('Customer not found');
+      throw boom.notFound(error.message);
+    }
+  }
+  async patch(id, body) {
+    try {
+      const customer = await this.findOne(id);
+      const patchingCustomer = await customer.update(body);
+      return patchingCustomer;
+    } catch (error) {
+      throw boom.badData(error.message);
     }
   }
   async put(id, body) {

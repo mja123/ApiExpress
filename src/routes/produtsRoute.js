@@ -3,10 +3,7 @@ const express = require('express');
 const ProductService = require('./../services/productService');
 const validatorHandler = require('./../middlewares/validators');
 const {
-  createSchema,
-  updateSchema,
-  deleteSchema,
-  findOneSchema,
+  createSchema, patchSchema, findOneSchema, putSchema
 } = require('./../validators/productsSchemaValidator');
 const router = express.Router();
 const service = new ProductService();
@@ -50,7 +47,8 @@ router.get(
 
 router.patch(
   '/:id',
-  validatorHandler(updateSchema, ['params', 'body']),
+  validatorHandler(findOneSchema, 'params'),
+  validatorHandler(patchSchema, 'body'),
   async (req, res, next) => {
     const { id } = req.params;
     let body = req.body;
@@ -66,7 +64,8 @@ router.patch(
 
 router.put(
   '/:id',
-  validatorHandler(updateSchema, ['params', 'body']),
+  validatorHandler(findOneSchema, 'params'),
+  validatorHandler(putSchema, 'body'),
   async (req, res, next) => {
     const { id } = req.params;
     const body = req.body;
@@ -82,7 +81,7 @@ router.put(
 
 router.delete(
   '/:id',
-  validatorHandler(deleteSchema, 'params'),
+  validatorHandler(findOneSchema, 'params'),
   async (req, res, next) => {
     const { id } = req.params;
 

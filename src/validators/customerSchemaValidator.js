@@ -19,11 +19,15 @@ const customerCreate = joi.object({
 const customerFind = joi.object({
     id: id.required(),
 });
-
+const customerPatch = joi.object({
+    lastName: lastName,
+    name: name,
+    pthone: phone,
+})
 const customerPut = joi.object({
     lastName: lastName.required(),
     name: name.required(),
     phone: phone.required(),
 });
 
-module.exports = { customerCreate, customerFind, customerPut };
+module.exports = { customerCreate, customerFind, customerPut, customerPatch };

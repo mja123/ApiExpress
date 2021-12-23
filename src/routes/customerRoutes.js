@@ -5,6 +5,7 @@ const {
   customerCreate,
   customerFind,
   customerPut,
+  customerPatch,
 } = require('./../validators/customerSchemaValidator');
 const validatorHandler = require('./../middlewares/validators');
 
@@ -66,6 +67,24 @@ router.put(
     }
   }
 );
+
+router.patch(
+  '/:id',
+  validatorHandler(customerFind, 'params'),
+  validatorHandler(customerPatch, 'body'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const body = req.params;
+
+      const patchedCustomer = await service.patch(id, body);
+      res.status(200).json(patchedCustomer);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.delete(
   '/:id',
   validatorHandler(customerFind, 'params'),

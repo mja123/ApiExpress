@@ -12,16 +12,15 @@ class UserService {
     }
   }
   async findOne(id) {
-      const user = await models.User.findOne({
-        where: {
-          id: id,
-        },
-      });
-      if(user) {
-        return user;
-      }
-      throw boom.notFound('User not found');
-
+    const user = await models.User.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (user) {
+      return user;
+    }
+    throw boom.notFound(error.message);
   }
 
   async post(body) {
@@ -40,36 +39,24 @@ class UserService {
 
   async put(id, body) {
     try {
-      console.log("id " + id)
+      console.log('id ' + id);
       const user = await this.findOne(id);
       const changingUser = await user.update({
         email: body.email,
         password: body.password,
         role: body.role || 'client',
-
       });
       return changingUser;
-    } catch(error) {
+    } catch (error) {
       throw boom.badRequest(error.message);
     }
   }
-
 
   async patch(id, body) {
     try {
       const user = await this.findOne(id);
 
-      let attributeChange;
-      if (body.password) {
-        attributeChange = 'password';
-      } else if (body.email) {
-        attributeChange = 'email';
-      } else {
-        attributeChange = 'role';
-      }
-      const patchedUser = await user.update({
-        attributeChange: attributeChange.body,
-      })
+      const patchedUser = await user.update(body);
       return patchedUser;
     } catch (error) {
       throw boom.notFound(error.message);

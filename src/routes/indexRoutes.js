@@ -2,6 +2,7 @@ const express = require('express');
 const productsRouter = require('./produtsRoute');
 const usersRouter = require('./usersRoute');
 const customersRouter = require('./customerRoutes');
+const categoriesRouter = require('./categoryRoutes');
 
 const routerApi = (app) => {
 //That's how I can use a mother route, who is share with all of the routes
@@ -10,6 +11,7 @@ const routerApi = (app) => {
   router.use('/products', productsRouter);
   router.use('/users', usersRouter);
   router.use('/customers', customersRouter);
+  router.use('/category', categoriesRouter)
 }
 
 module.exports = routerApi;

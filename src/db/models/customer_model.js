@@ -33,6 +33,7 @@ const customerSchema = {
     field: 'updated_at',
     defaultValue: Sequelize.NOW,
   },
+  //here we need the atribute field: 'user_id' to have the best pratices in db
   userId: {
     allowNull: false,
     type: DataTypes.INTEGER,

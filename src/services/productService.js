@@ -12,8 +12,8 @@ class ProductService {
   }
 
   async findOne(id) {
-    const product = await models.Product.findOne(id);
-    if(product) {
+    const product = await models.Product.findByPk(id);
+    if(product != null) {
       return product;
     }
     throw boom.notFound('Product not found');
@@ -25,6 +25,7 @@ class ProductService {
       const newProduct = await models.Product.create({
         name: body.name,
         price: body.price,
+        categoryId: body.categoryId,
       });
       return newProduct;
     } catch (error) {
@@ -35,18 +36,10 @@ class ProductService {
   async patch(id, body) {
     try{
       const product = await this.findOne(id);
-      let attributeToChange;
-      if(body.name) {
-        attributeToChange = 'name';
-      } else {
-        attributeToChange = 'price'
-      }
-      const patchingProduct = await product.update({
-        attributeToChange: attributeToChange.body
-      })
+      const patchingProduct = await product.update(body)
       return patchingProduct
     } catch(error) {
-      throw boom.notFound('Product not found!');
+      throw boom.badData(error.message)
     }
 
   }
@@ -54,10 +47,14 @@ class ProductService {
 
     try{
       const product = await this.findOne(id);
-      const puttingProduct = await product.update(body)
+      const puttingProduct = await product.update({
+        name: body.name,
+        price: body.price,
+        categoryId: body.categoryId,
+      })
       return puttingProduct
     } catch(error) {
-      throw boom.notFound('Product not found!');
+      throw boom.badData(error.message);
     }
 
   }
@@ -68,7 +65,7 @@ class ProductService {
       await deletingProduct.destroy();
       return id;
     } catch(error) {
-      throw boom.notFound(error.message);
+      throw boom.badImplementation(error.message);
     }
   }
 }
