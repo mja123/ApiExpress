@@ -23,11 +23,14 @@ router.get('/', queryValidator("products"),
   }
 });
 router.get('/:id',
+queryValidator("products"),
 validatorHandler(findOneCategory, 'params'),
  async (req, res, next) => {
+    const products = req.query;
     const { id } = req.params;
+    console.log(products);
     try {
-      const category = await service.findOne(id);
+      const category = await service.findOne(id, products);
       res.status(200).json(category);
     } catch (error) {
       next(error);

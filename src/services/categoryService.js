@@ -5,7 +5,7 @@ class CategoryService {
   async get(products) {
     try {
       let categories;
-      if (products != undefined) {
+      if (Object.keys(products).length > 0) {
         categories = await models.Category.findAll({ include: 'products' });
       } else {
         categories = await models.Category.findAll();
@@ -15,12 +15,18 @@ class CategoryService {
       throw boom.badRequest(error.message);
     }
   }
-  async findOne(id) {
+  async findOne(id, products) {
     try {
-      const category = await models.Category.findByPk(id);
-      if (category != null) {
+        let category;
+        if (Object.keys(products).length > 0) {
+          category = await models.Category.findOne({
+            id: id,
+            include: 'products'
+          })
+        } else {
+          category = await models.Category.findByPk(id);
+        }
         return category;
-      }
     } catch (error) {
       throw boom.notFound(error.message);
     }
