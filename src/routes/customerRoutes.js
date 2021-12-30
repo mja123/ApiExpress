@@ -43,10 +43,12 @@ router.post(
 router.get(
   '/:id',
   validatorHandler(customerFind, 'params'),
+  queryValidator('users'),
   async (req, res, next) => {
     const { id } = req.params;
+    const { users } = req.query;
     try {
-      const customer = await service.findOne(id);
+      const customer = await service.findOne(id, users);
       res.status(200).json(customer);
     } catch (error) {
       next(error);

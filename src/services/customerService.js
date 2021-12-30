@@ -10,7 +10,9 @@ class customerService {
           include: 'user',
         });
       } else {
-        allCustomers = await models.Customer.findAll();
+        allCustomers = await models.Customer.findAll({
+          include: 'order',
+        });
       }
       return allCustomers;
     } catch (error) {
@@ -48,8 +50,13 @@ class customerService {
       throw boom.badData(error.message);
     }
   }
-  async findOne(id) {
-    const customer = await models.Customer.findByPk(id);
+  async findOne(id, includeUser) {
+    let customer;
+    if(includeUser == "true"){
+     customer = await models.Customer.findByPk(id, { include: 'user'});
+    } else {
+       customer = await models.Customer.findByPk(id)
+    }
     if (customer != null) {
       return customer;
     } else {
