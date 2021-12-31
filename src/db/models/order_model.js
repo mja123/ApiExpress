@@ -19,6 +19,21 @@ const orderSchema = {
     allowNull: false,
     defaultValue: "In preparation",
   },
+  total: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      console.log(this.items)
+      if(this.items) {
+        if (this.items.length > 0) {
+          return this.items.reduce((total, item) => {
+            return total + (item.price * item.OrdersProducts.amount);
+          }, 0);
+        }
+      }
+      
+      return 0;
+    }
+  },
   updatedAt: {
     type: DataTypes.DATE,
     field: 'updated_at',
