@@ -1,4 +1,5 @@
 const boom = require('@hapi/boom');
+const bcrypt = require('bcrypt');
 //models is created when we initialized the model, and the way to use it is with the modelName in the config of the User's Model
 const { models } = require('./../libs/sequelize');
 
@@ -25,12 +26,14 @@ class UserService {
 
   async post(body) {
     try {
+      const hashPassword = await bcrypt.hash(body.password, 8);
       const newUser = await models.User.create({
-        email: body.email,
-        password: body.password,
-        role: body.role,
+        ...body,
+        password: hashPassword,
       });
-
+  
+      //bodyValues added is to the internal manner sequelize works (when console.log(newUser) there is a subobject call dataValues)
+      delete newUser.dataValues.password;
       return newUser;
     } catch (error) {
       throw boom.badData(error.message);

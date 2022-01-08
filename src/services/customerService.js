@@ -1,11 +1,13 @@
 const boom = require('@hapi/boom');
+const bcrypt = require('bcrypt');
+
 const { models } = require('./../libs/sequelize');
 
 class customerService {
   async get(includeUser) {
     try {
       let allCustomers = {};
-      if(includeUser == "true") {
+      if (includeUser == 'true') {
         allCustomers = await models.Customer.findAll({
           include: 'user',
         });
@@ -21,21 +23,23 @@ class customerService {
   }
   async create(body, includeUser) {
     try {
-      let createCustomer = {};
+      let createCustomer;
 
-      if(includeUser == "true"){
-        const newUser = await models.User.create({
+      if (includeUser == 'true') {
+        const hashPassword = await bcrypt.hash(body.user.password, 8);
+        const userSecureData = {
+          ...body.user,
+          password: hashPassword,
+        };
+        const newUser = await models.User.create(userSecureData);
 
-          email: body.user.email,
-          password: body.user.password,
-        })
-        console.log(newUser.id)
         createCustomer = await models.Customer.create({
           name: body.name,
           lastName: body.lastName,
           phone: body.phone,
           userId: newUser.id,
-        })
+        });
+        console.log(createCustomer);
       } else {
         createCustomer = await models.Customer.create({
           name: body.name,
@@ -44,7 +48,7 @@ class customerService {
           userId: body.userId,
         });
       }
-      
+
       return createCustomer;
     } catch (error) {
       throw boom.badData(error.message);
@@ -52,10 +56,10 @@ class customerService {
   }
   async findOne(id, includeUser) {
     let customer;
-    if(includeUser == "true"){
-     customer = await models.Customer.findByPk(id, { include: 'user'});
+    if (includeUser == 'true') {
+      customer = await models.Customer.findByPk(id, { include: 'user' });
     } else {
-       customer = await models.Customer.findByPk(id)
+      customer = await models.Customer.findByPk(id);
     }
     if (customer != null) {
       return customer;
